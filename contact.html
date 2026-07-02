@@ -199,6 +199,7 @@
     .footer-bottom { flex-direction: column; align-items: flex-start; }
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -305,9 +306,42 @@
   typeCreator.addEventListener('change', syncToggle);
   typeCompany.addEventListener('change', syncToggle);
 
+  emailjs.init({ publicKey: 'ahV6whCDp3N4ar0RgsfNe' });
+
   document.getElementById('contactForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    document.getElementById('formNote').classList.add('visible');
+
+    const submitBtn = document.querySelector('.submit-btn');
+    const formNote = document.getElementById('formNote');
+    const params = {
+      type: typeCreator.checked ? 'Content Creator' : 'Unternehmensvertreter',
+      name: document.getElementById('name').value,
+      email: document.getElementById('email').value,
+      company: document.getElementById('company').value,
+      interest: document.getElementById('interest').value,
+      channel: document.getElementById('channel').value,
+      message: document.getElementById('message').value
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Wird gesendet...';
+
+    emailjs.send('service_rmctj8r', 'template_wkrsr0w', params)
+      .then(function () {
+        formNote.textContent = 'Danke für deine Nachricht! Wir melden uns so schnell wie möglich.';
+        formNote.classList.add('visible');
+        document.getElementById('contactForm').reset();
+        syncToggle();
+      })
+      .catch(function (error) {
+        formNote.textContent = 'Da ist etwas schiefgelaufen. Bitte versuch es später erneut oder schreib uns direkt an support@netpd.de.';
+        formNote.classList.add('visible');
+        console.error('EmailJS error:', error);
+      })
+      .finally(function () {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Nachricht senden';
+      });
   });
 </script>
 
