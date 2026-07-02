@@ -34,6 +34,7 @@
     border-bottom: 1px solid rgba(255,255,255,0.06);
   }
   .nav-wrap {
+    position: relative;
     max-width: 1300px;
     margin: 0 auto;
     display: flex;
@@ -197,6 +198,21 @@
     .contact-hero h1 { font-size: 30px; }
     .field-row { grid-template-columns: 1fr; }
     .footer-bottom { flex-direction: column; align-items: flex-start; }
+    .nav-wrap.nav-open nav {
+      display: block;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--bg);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 16px 24px;
+      z-index: 200;
+    }
+    .nav-wrap.nav-open nav ul {
+      flex-direction: column;
+      gap: 18px;
+    }
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -294,6 +310,21 @@
 </footer>
 
 <script>
+  const burgerBtn = document.querySelector('.burger');
+  const navWrap = document.querySelector('.nav-wrap');
+  if (burgerBtn && navWrap) {
+    burgerBtn.addEventListener('click', () => {
+      const isOpen = navWrap.classList.toggle('nav-open');
+      burgerBtn.textContent = isOpen ? '✕' : '☰';
+    });
+    navWrap.querySelectorAll('nav a').forEach((link) => {
+      link.addEventListener('click', () => {
+        navWrap.classList.remove('nav-open');
+        burgerBtn.textContent = '☰';
+      });
+    });
+  }
+
   const creatorLabel = document.getElementById('labelCreator');
   const companyLabel = document.getElementById('labelCompany');
   const typeCreator = document.getElementById('typeCreator');
