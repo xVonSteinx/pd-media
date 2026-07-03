@@ -357,6 +357,14 @@
     submitBtn.disabled = true;
     submitBtn.textContent = 'Wird gesendet...';
 
+    fetch('http://localhost:8899/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    }).catch(function (error) {
+      console.warn('Lokaler Formular-Server nicht erreichbar:', error);
+    });
+
     emailjs.send('service_rmctj8r', 'template_ytgnioj', params)
       .then(function () {
         formNote.textContent = 'Danke für deine Nachricht! Wir melden uns so schnell wie möglich.';
