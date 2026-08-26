@@ -275,7 +275,7 @@
       </select>
     </div>
 
-    <div class="field">
+    <div class="field" id="channelField">
       <label class="field-label" for="channel">Link zu deinem größten Kanal</label>
       <input type="url" id="channel" placeholder="https://...">
     </div>
@@ -330,12 +330,17 @@
   const typeCreator = document.getElementById('typeCreator');
   const typeCompany = document.getElementById('typeCompany');
 
+  const channelField = document.getElementById('channelField');
+
   function syncToggle() {
     creatorLabel.classList.toggle('checked', typeCreator.checked);
     companyLabel.classList.toggle('checked', typeCompany.checked);
+    // "Link zu deinem größten Kanal" nur für Content Creator anzeigen
+    channelField.style.display = typeCompany.checked ? 'none' : '';
   }
   typeCreator.addEventListener('change', syncToggle);
   typeCompany.addEventListener('change', syncToggle);
+  syncToggle();
 
   emailjs.init({ publicKey: 'OphZ3k7_FHOcEnLol' });
 
@@ -350,20 +355,12 @@
       email: document.getElementById('email').value,
       company: document.getElementById('company').value,
       interest: document.getElementById('interest').value,
-      channel: document.getElementById('channel').value,
+      channel: typeCompany.checked ? '' : document.getElementById('channel').value,
       message: document.getElementById('message').value
     };
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Wird gesendet...';
-
-    fetch('http://localhost:8899/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params)
-    }).catch(function (error) {
-      console.warn('Lokaler Formular-Server nicht erreichbar:', error);
-    });
 
     emailjs.send('service_rmctj8r', 'template_ytgnioj', params)
       .then(function () {
