@@ -349,20 +349,33 @@
 
     const submitBtn = document.querySelector('.submit-btn');
     const formNote = document.getElementById('formNote');
+    const type = typeCreator.checked ? 'Content Creator' : 'Unternehmensvertreter';
+    const company = document.getElementById('company').value;
+    const interest = document.getElementById('interest').value;
+    const channel = typeCompany.checked ? '' : document.getElementById('channel').value;
+    const email = document.getElementById('email').value;
+
+    // Das EmailJS-Template zeigt {{name}}, {{time}} und {{message}} an —
+    // deshalb werden alle Detailfelder in die Nachricht mit aufgenommen.
+    const details = [
+      'Typ: ' + type,
+      'E-Mail: ' + email,
+      company ? 'Unternehmen: ' + company : '',
+      interest ? 'Interessensgebiet: ' + interest : '',
+      channel ? 'Kanal-Link: ' + channel : ''
+    ].filter(Boolean).join('\n');
+
     const params = {
-      type: typeCreator.checked ? 'Content Creator' : 'Unternehmensvertreter',
       name: document.getElementById('name').value,
-      email: document.getElementById('email').value,
-      company: document.getElementById('company').value,
-      interest: document.getElementById('interest').value,
-      channel: typeCompany.checked ? '' : document.getElementById('channel').value,
-      message: document.getElementById('message').value
+      email: email,
+      time: new Date().toLocaleString('de-DE'),
+      message: details + '\n\nNachricht:\n' + document.getElementById('message').value
     };
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Wird gesendet...';
 
-    emailjs.send('service_rmctj8r', 'template_ytgnioj', params)
+    emailjs.send('service_d5bjkvd', 'template_ytgnioj', params)
       .then(function () {
         formNote.textContent = 'Danke für deine Nachricht! Wir melden uns so schnell wie möglich.';
         formNote.classList.add('visible');
