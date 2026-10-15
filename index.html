@@ -406,6 +406,44 @@
   .footer-links { display: flex; gap: 24px; font-size: 13px; color: var(--muted); }
   .footer-copy { font-size: 13px; color: var(--muted); }
 
+  /* Webdesign-Teaser */
+  .wd-teaser {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 48px;
+    align-items: center;
+    padding: 48px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, rgba(124,58,237,.18), rgba(34,211,238,.06));
+    border: 1px solid rgba(124,58,237,.35);
+  }
+  .wd-copy .eyebrow { color: var(--accent-2); font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+  .wd-copy h2 { font-size: 36px; margin: 10px 0 14px; line-height: 1.15; }
+  .wd-copy p { color: var(--muted); font-size: 16px; line-height: 1.6; max-width: 520px; }
+  .wd-points { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 28px; }
+  .wd-points li { padding: 7px 14px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); font-size: 14px; }
+  .wd-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 22px; }
+  .wd-mock { display: block; border-radius: 16px; overflow: hidden; background: #fbf7f2; box-shadow: 0 30px 70px -25px rgba(124,58,237,.6); transform: rotate(2deg); transition: transform .4s ease; }
+  .wd-mock:hover { transform: rotate(0deg) translateY(-4px); }
+  .wd-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: #ece6de; }
+  .wd-bar i { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; }
+  .wd-bar i:nth-child(2) { background: #febc2e; }
+  .wd-bar i:nth-child(3) { background: #28c840; }
+  .wd-bar span { margin-left: auto; margin-right: auto; font-size: 11px; color: #6b6259; background: #fff; padding: 3px 14px; border-radius: 6px; }
+  .wd-site { padding: 26px 24px; display: grid; gap: 10px; }
+  .wd-line { height: 10px; border-radius: 6px; background: #e3d8cb; }
+  .wd-line--s { width: 30%; background: #c0592e; height: 7px; }
+  .wd-line--l { width: 85%; height: 18px; background: #2a1f17; }
+  .wd-line--m { width: 60%; }
+  .wd-btn { width: 110px; height: 26px; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); margin: 6px 0 10px; }
+  .wd-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .wd-cards div { height: 58px; border-radius: 10px; background: #fff; border: 1px solid #efe6db; }
+  @media (max-width: 860px) {
+    .wd-teaser { grid-template-columns: 1fr; padding: 30px 22px; gap: 32px; }
+    .wd-copy h2 { font-size: 28px; }
+    .wd-mock { transform: none; }
+  }
+
   @media (max-width: 860px) {
     nav, .socials { display: none; }
     .burger { display: block; }
@@ -438,6 +476,7 @@
       <ul>
         <li><a href="#">Startseite</a></li>
         <li><a href="/creator">Creator</a></li>
+        <li><a href="/webdesign/">Webdesign</a></li>
         <li><a href="/kontakt">Kontakt</a></li>
       </ul>
     </nav>
@@ -498,6 +537,35 @@
       <button id="scrollLeft">←</button>
       <button id="scrollRight">→</button>
     </div>
+  </div>
+</section>
+
+<section class="container" id="webdesign">
+  <div class="wd-teaser">
+    <div class="wd-copy">
+      <div class="eyebrow">Neu bei PD Media</div>
+      <h2>Websites, die Kunden bringen.</h2>
+      <p>Wir bauen moderne Websites für lokale Unternehmen: individuell gestaltet, perfekt auf dem Smartphone und rechtlich sauber. Ein Jahr Hosting und Betreuung ist immer dabei.</p>
+      <ul class="wd-points">
+        <li>Festpreis ab 490 €</li>
+        <li>1. Jahr Hosting inklusive</li>
+        <li>Preis in 2 Minuten berechnen</li>
+      </ul>
+      <div class="wd-actions">
+        <a class="btn-primary" href="/webdesign/#konfigurator">Website konfigurieren</a>
+        <a class="view-all" href="/webdesign/">Mehr zu Webdesign →</a>
+      </div>
+    </div>
+    <a class="wd-mock" href="/webdesign/" aria-label="Zur Webdesign-Seite">
+      <div class="wd-bar"><i></i><i></i><i></i><span>ihre-firma.de</span></div>
+      <div class="wd-site">
+        <div class="wd-line wd-line--s"></div>
+        <div class="wd-line wd-line--l"></div>
+        <div class="wd-line wd-line--m"></div>
+        <div class="wd-btn"></div>
+        <div class="wd-cards"><div></div><div></div><div></div></div>
+      </div>
+    </a>
   </div>
 </section>
 

@@ -4,10 +4,14 @@
 
 const CONFIG = {
   brand: 'PD Media',
-  email: 'hallo@deine-domain.de',      // Fallback, falls der Server nicht erreichbar ist
-  endpoint: '/api/anfrage',             // POST-Endpunkt (siehe server.py)
-  // Vorschau-Modus (online ohne Server): nichts wird übertragen, die Bestätigung sagt das offen
-  preview: document.querySelector('meta[name="pd-modus"]')?.content === 'vorschau',
+  email: 'support@netpd.de',           // Fallback, falls das Senden fehlschlägt
+  // Versandweg, gesetzt per <meta name="pd-modus">:
+  //   server   → POST an endpoint (lokal mit server.py, Standard)
+  //   emailjs  → E-Mail über EmailJS, wie das Kontaktformular auf netpd.de
+  //   vorschau → nichts wird übertragen, die Bestätigung sagt das offen (claude.ai-Vorschau)
+  mode: document.querySelector('meta[name="pd-modus"]')?.content || 'server',
+  endpoint: '/api/anfrage',
+  emailjs: { publicKey: 'OphZ3k7_FHOcEnLol', serviceId: 'service_d5bjkvd', templateId: 'template_ytgnioj' },
   storageKey: 'pdmedia-konfigurator-v1',
   extraPagePrice: 50,                   // Preis je zusätzlicher Unterseite
   includedPages: 5,
@@ -527,10 +531,13 @@ const Configurator = (() => {
       seite: location.href,
       website_hp: $('#website_hp').value,
     };
-    if (CONFIG.preview) { showDone(); return; }
+    if (CONFIG.mode === 'vorschau') { showDone(); return; }
     try {
-      const res = await fetch(CONFIG.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (CONFIG.mode === 'emailjs') await sendEmailjs(payload);
+      else {
+        const res = await fetch(CONFIG.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      }
       showDone();
     } catch (err) {
       console.warn('Anfrage konnte nicht gesendet werden:', err);
@@ -538,9 +545,23 @@ const Configurator = (() => {
       setNextLabel();
       const box = document.createElement('div');
       box.className = 'form-error';
-      box.innerHTML = `Die Anfrage konnte gerade nicht übertragen werden. Sie können sie stattdessen <a href="${mailtoHref()}">per E-Mail senden</a> – alle Angaben sind bereits eingefügt.`;
+      box.innerHTML = `Die Anfrage konnte gerade nicht übertragen werden. Bitte versuchen Sie es erneut oder <a href="${mailtoHref()}">senden Sie sie per E-Mail</a> an ${CONFIG.email} – alle Angaben sind bereits eingefügt.`;
       $('#configNav').before(box);
     }
+  }
+
+  // Gleiches Template wie das Kontaktformular auf netpd.de: {{name}}, {{time}}, {{message}}
+  async function sendEmailjs(payload) {
+    if (payload.website_hp) return; // Bot-Falle: still verwerfen
+    if (!window.emailjs) throw new Error('EmailJS nicht geladen');
+    const { publicKey, serviceId, templateId } = CONFIG.emailjs;
+    window.emailjs.init({ publicKey });
+    await window.emailjs.send(serviceId, templateId, {
+      name: state.name,
+      email: state.email,
+      time: new Date().toLocaleString('de-DE'),
+      message: `Typ: Webdesign-Anfrage (Website-Konfigurator)\n\n${payload.zusammenfassung}`,
+    });
   }
 
   function mailtoHref() {
@@ -557,7 +578,7 @@ const Configurator = (() => {
     doneView.innerHTML = `
       <div class="done__ic">${icon('check')}</div>
       <h3>Vielen Dank${first ? `, ${esc(first)}` : ''}!</h3>
-      ${CONFIG.preview
+      ${CONFIG.mode === 'vorschau'
         ? `<p>So sieht Ihre Zusammenstellung aus. Kopieren Sie die Zusammenfassung für Ihre Anfrage – darauf basiert Ihr persönliches Festpreis-Angebot.</p>
            <span class="done__note">${icon('info')} Vorschau-Version: Das Formular überträgt noch keine Anfragen.</span>`
         : `<p>Ihre Anfrage ist eingegangen. Ich sehe mir alles genau an und melde mich innerhalb von 24 Stunden (werktags) mit Ihrem persönlichen Festpreis-Angebot.</p>`}
