@@ -440,20 +440,6 @@ section.container { max-width: 1180px !important; padding: 110px 24px !important
   color: transparent !important;
 }
 
-/* ---------- Partner-Laufband ---------- */
-.clients { background: transparent !important; }
-.clients-track { gap: 18px !important; animation-duration: 32s !important; }
-.clients-track-wrap:hover .clients-track { animation-play-state: paused; }
-.clients-track .logo-card {
-  background: rgba(255,255,255,0.92) !important;
-  border-radius: 16px !important;
-  padding: 18px 34px !important;
-  filter: grayscale(1);
-  opacity: .8;
-  transition: filter .3s, opacity .3s;
-}
-.clients-track .logo-card:hover { filter: none; opacity: 1; }
-
 /* ---------- Profilseiten ---------- */
 .profile-banner { border-radius: 0 0 32px 32px; }
 .profile-photo {
