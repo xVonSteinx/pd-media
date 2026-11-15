@@ -172,6 +172,78 @@
   }
   .form-note.visible { display: block; }
 
+  /* Creator-Auswahl (nur für Unternehmen) */
+  .field-hint { font-weight: 400; color: var(--muted); }
+  .creator-pick {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .creator-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(0,0,0,0.28);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  }
+  .creator-option:hover { border-color: rgba(255,255,255,0.28); }
+  .creator-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .creator-option img,
+  .creator-option-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .creator-option-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.06);
+    border: 1px dashed rgba(255,255,255,0.25);
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .creator-option-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .creator-option-text strong { font-size: 15px; }
+  .creator-option-text small { font-size: 12px; color: var(--muted); }
+  .creator-option::after {
+    content: "";
+    margin-left: auto;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.25);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .creator-option:has(input:checked) {
+    border-color: var(--accent);
+    background: rgba(139, 92, 246, 0.14);
+  }
+  .creator-option:has(input:checked)::after {
+    content: "✓";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  }
+  .creator-option:has(input:focus-visible) { box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.3); }
+
   /* Footer (identisch zu index.html) */
   footer {
     border-top: 1px solid rgba(255,255,255,0.06);
@@ -276,6 +348,36 @@
       </select>
     </div>
 
+    <div class="field" id="creatorField">
+      <span class="field-label">Für welche Creator interessierst du dich? <span class="field-hint">(Mehrfachauswahl möglich)</span></span>
+      <div class="creator-pick">
+        <label class="creator-option">
+          <input type="checkbox" name="creators" value="KratosKai1974">
+          <img src="images/creator-kratoskai1974.png" alt="">
+          <span class="creator-option-text">
+            <strong>KratosKai1974</strong>
+            <small>Twitch · TikTok · Instagram</small>
+          </span>
+        </label>
+        <label class="creator-option">
+          <input type="checkbox" name="creators" value="Malerart">
+          <img src="images/creator-malerart.png" alt="">
+          <span class="creator-option-text">
+            <strong>Malerart</strong>
+            <small>TikTok · Instagram · YouTube</small>
+          </span>
+        </label>
+        <label class="creator-option creator-option-open">
+          <input type="checkbox" name="creators" value="Noch offen – bitte beraten">
+          <span class="creator-option-icon">?</span>
+          <span class="creator-option-text">
+            <strong>Noch unsicher</strong>
+            <small>Ihr dürft uns beraten</small>
+          </span>
+        </label>
+      </div>
+    </div>
+
     <div class="field" id="channelField">
       <label class="field-label" for="channel">Link zu deinem größten Kanal</label>
       <input type="url" id="channel" placeholder="https://...">
@@ -332,15 +434,31 @@
   const typeCompany = document.getElementById('typeCompany');
 
   const channelField = document.getElementById('channelField');
+  const creatorField = document.getElementById('creatorField');
+  const creatorBoxes = document.querySelectorAll('input[name="creators"]');
 
   function syncToggle() {
     creatorLabel.classList.toggle('checked', typeCreator.checked);
     companyLabel.classList.toggle('checked', typeCompany.checked);
-    // "Link zu deinem größten Kanal" nur für Content Creator anzeigen
+    // "Link zu deinem größten Kanal" nur für Content Creator anzeigen,
+    // die Creator-Auswahl nur für Unternehmen
     channelField.style.display = typeCompany.checked ? 'none' : '';
+    creatorField.style.display = typeCompany.checked ? '' : 'none';
   }
   typeCreator.addEventListener('change', syncToggle);
   typeCompany.addEventListener('change', syncToggle);
+
+  // Von einem Creator-Profil kommend (/kontakt?creator=malerart):
+  // Unternehmen auswählen und den Creator schon anhaken
+  const preselect = new URLSearchParams(location.search).get('creator');
+  if (preselect) {
+    creatorBoxes.forEach((box) => {
+      if (box.value.toLowerCase() === preselect.toLowerCase()) {
+        box.checked = true;
+        typeCompany.checked = true;
+      }
+    });
+  }
   syncToggle();
 
   emailjs.init({ publicKey: 'OphZ3k7_FHOcEnLol' });
@@ -355,6 +473,9 @@
     const interest = document.getElementById('interest').value;
     const channel = typeCompany.checked ? '' : document.getElementById('channel').value;
     const email = document.getElementById('email').value;
+    const creators = typeCompany.checked
+      ? Array.from(creatorBoxes).filter((box) => box.checked).map((box) => box.value).join(', ')
+      : '';
 
     // Das EmailJS-Template zeigt {{name}}, {{time}} und {{message}} an —
     // deshalb werden alle Detailfelder in die Nachricht mit aufgenommen.
@@ -363,6 +484,7 @@
       'E-Mail: ' + email,
       company ? 'Unternehmen: ' + company : '',
       interest ? 'Interessensgebiet: ' + interest : '',
+      creators ? 'Gewünschte Creator: ' + creators : '',
       channel ? 'Kanal-Link: ' + channel : ''
     ].filter(Boolean).join('\n');
 
